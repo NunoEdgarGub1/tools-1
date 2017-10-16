@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+# This file contains several toolbox functions to process 1D numpy arrays - basic signal treatment, filters, etc.
+# 
+# Created by R. Proux, 16/10/2017
 
 import pylab as pl
 import scipy.signal
