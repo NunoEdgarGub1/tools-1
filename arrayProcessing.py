@@ -88,6 +88,26 @@ def filter_cosmic_rays(spectrum, error_thr=10., filter_size=5):
     
     return spectrum_corr
 
+    
+def range_to_edge(middles):
+    """Converts from a list of values to list of boundaries
+    i.e. (1, 2, 3) becomes (0.5, 1.5, 2.5, 3.5)
+    Useful for pcolorfast plotting.
+    Can handle irregular values (not evenly spaced). It uses the middle of each interval 
+    and adds half an interval at the beginning and at the end.
+    
+    Args:
+        middles (iterable): 1D list of numbers (can be a numpy array or a list)
+    
+    Returns:
+        numpy array: list of edges (has len(middles)+1 elements)
+    """
+    edges = [(float(leftMiddle) + rightMiddle) / 2 for leftMiddle, rightMiddle in zip(middles[1:], middles[:-1])]
+    edges.insert(0, float(middles[0]) - (edges[0] - middles[0]))
+    edges.append(float(middles[-1]) + (middles[-1] - edges[-1]))
+    
+    return pl.array(edges)
+
 
 if __name__ == '__main__':
     x = pl.linspace(0, 10, 100)
