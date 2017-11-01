@@ -33,7 +33,7 @@ user_settings['HWPC0526-EPS'] = {
 hostpc = socket.gethostname()
 print 'Loaded settings for: ', user_settings[hostpc]['description']
 
-folder = settings[hostpc]['folder']
+folder = user_settings[hostpc]['folder']
 sys.path.append (folder)
 sys.path.append (folder+ '/analysis/')
 sys.path.append (folder+ '/simulations/')
