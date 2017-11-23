@@ -12,6 +12,7 @@ Classes that need to load/save data from HDF5 files can inherit this class
 
 """
 import numpy as np
+import h5py
 
 class DataObjectHDF5 ():
 	
@@ -58,11 +59,20 @@ class DataObjectHDF5 ():
 
 		for k in obj.__dict__.keys():
 			if (type(obj.__dict__[k]) in [int, float, str]):
-				file_handle.attrs[k] = getattr (obj, k)
+				try:
+					file_handle.attrs[k] = getattr (obj, k)
+				except:
+					file_handle[k] = getattr (obj, k)
 			elif isinstance(obj.__dict__[k], np.float64):
-				file_handle.attrs[k] = getattr (obj, k)
+				try:
+					file_handle.attrs[k] = getattr (obj, k)
+				except:
+					file_handle[k] = getattr (obj, k)
 			elif isinstance(obj.__dict__[k], np.int32):
-				file_handle.attrs[k] = getattr (obj, k)
+				try:
+					file_handle.attrs[k] = getattr (obj, k)
+				except:
+					file_handle[k] = getattr (obj, k)
 			elif isinstance(obj.__dict__[k], np.ndarray):
 				file_handle.create_dataset (k, data = getattr (obj, k))
 
