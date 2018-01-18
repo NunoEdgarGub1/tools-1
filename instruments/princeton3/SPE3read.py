@@ -115,7 +115,10 @@ class SPE3map:
 
     def _readWavelengths(self):
         """Extracts the wavelength vector determined by spectrometer calibration"""
-        wavelengthStr = self._footerInfo['SpeFormat']['Calibrations']['WavelengthMapping']['Wavelength']['#text']
+        try:
+            wavelengthStr = self._footerInfo['SpeFormat']['Calibrations']['WavelengthMapping']['Wavelength']['#text']
+        except TypeError:  # will happen if <Wavelength> has no attributes (it happened). The ['#text'] won't exist then.
+            wavelengthStr = self._footerInfo['SpeFormat']['Calibrations']['WavelengthMapping']['Wavelength']
         self.wavelength = pl.array([float(w) for w in wavelengthStr.split(',')])
         
     def _readFramesInfo(self):
