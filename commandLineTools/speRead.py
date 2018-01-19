@@ -23,7 +23,7 @@ import tools.instruments.princeton3.SPE3read as spe3
 def spe_read(filename, index=0, export=None, autoexport=False):
     """
     Reads, plots and exports an SPE2 or SPE3 file from Princeton Instruments (WinSpec and Lightfield).
-    Handles multiple frames by using left and right arrows (try combining with alt and ctrl/cmd to change scrolling speed).
+    Handles multiple frames by using left and right arrows (try combining with alt and windows/cmd/super/ctrl to change scrolling speed).
     """
     if autoexport:
         filename_noext, _ = os.path.splitext(filename)
