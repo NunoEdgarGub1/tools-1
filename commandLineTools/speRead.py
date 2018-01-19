@@ -32,7 +32,14 @@ def spe_read(filename, index=0, export=None, autoexport=False):
 
 class SpeRead():
     def __init__(self, filename, start_index=0, export=None, autoexport=False):
-
+        """Object used to read SPE files, plot them and export them to a text file
+        
+        Args:
+            filename (str): path to the SPE file
+            start_index (int, optional): index of the frame you want to export or the plot to start.
+            export (str, optional): path to the exported text file. If None, will plot the spectra, if not None, will export.
+            autoexport (bool, optional): if True, will export with an automated 'filename + frame number' named text file.
+        """
         self.data = self.open_spe(filename)
 
         self.curr_pos = start_index
@@ -44,7 +51,14 @@ class SpeRead():
             pl.savetxt(export, save_array)
 
     def open_spe(self, filename):
-
+        """Opens the SPE file as an SPE3map or SPE2map (automatic selection) from the corresponding libraries.
+        
+        Args:
+            filename (str): path to the SPE file to open
+        
+        Returns:
+            SPE3map or SPE2map object: object to handle the file (access to wavelength vector, different frames, etc.)
+        """
         try:
             data = spe3.SPE3map(filename)
         except:
@@ -53,6 +67,12 @@ class SpeRead():
         return data
 
     def init_plot(self, start_index):
+        """First plot, to call before plot_spe() which is meant to update the plot only.
+        Note it will make the first call for plot_spe() so plot_spe() can be called by the user to then update the plot.
+        
+        Args:
+            start_index (int): frame index for the first plot
+        """
         self.fig = pl.figure()
         self.fig.canvas.mpl_connect('key_press_event', self.key_event)
         self.ax = self.fig.add_subplot(111)
@@ -60,7 +80,11 @@ class SpeRead():
         pl.show()
 
     def plot_spe(self, index):
-        # should be called after init_plot()
+        """Update the plot (should be called after init_plot())
+        
+        Args:
+            index (int): frame index for the new plot
+        """
         self.ax.cla()
         pl.plot(self.data.wavelength, self.data.data[index][0])
         pl.xlabel('Wavelength (nm)')
@@ -69,7 +93,12 @@ class SpeRead():
         self.fig.canvas.draw()
 
     def key_event(self, e):
-
+        """Callback called when a key is pressed in the matplotlib window.
+        
+        Args:
+            e (event identifier (matplotlib)): is provided automatically by matplotlib when the callback is called.
+        
+        """
         if e.key == "right":
             self.curr_pos = self.curr_pos + 1
         elif e.key == "left":
