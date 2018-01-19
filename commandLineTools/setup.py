@@ -9,7 +9,7 @@
 from setuptools import setup
 
 setup(
-    name="speread",
+    name="qplCommandLineTools",
     version='0.1',
     py_modules=['speRead'],
     install_requires=[
