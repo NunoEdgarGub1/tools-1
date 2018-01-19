@@ -1,0 +1,7 @@
+speRead.py
+speread.egg-info/PKG-INFO
+speread.egg-info/SOURCES.txt
+speread.egg-info/dependency_links.txt
+speread.egg-info/entry_points.txt
+speread.egg-info/requires.txt
+speread.egg-info/top_level.txt

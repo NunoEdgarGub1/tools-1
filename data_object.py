@@ -8,7 +8,7 @@
 Class that allows to save all variables in HDF5 files
 One can also save the code in specific modules, listed in self._called_modules
 
-Classes that need to load/save data from HDF% files can inherit this class
+Classes that need to load/save data from HDF5 files can inherit this class
 
 """
 import numpy as np
