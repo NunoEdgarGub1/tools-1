@@ -51,7 +51,7 @@ setup(
 )
 ```
 
-To add your own command `plottrace`, you simply need to modify the èntry_points` variable by adding a line at the end, as such:
+To add your own command `plottrace`, you simply need to modify the `entry_points` variable by adding a line at the end, as such:
 ```
 entry_points='''
         [console_scripts]
@@ -66,7 +66,7 @@ You have to reinstall the `qplCommandLineTools` package to take your new command
 
 ## Uninstallation
 
-To uninstall, run:
+To uninstall, run the following from inside the `commandLineTools` folder:
 ```
 pip uninstall .
 ```
