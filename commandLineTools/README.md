@@ -14,6 +14,11 @@ pip install .
 ```
 Note that you can add an `--editable` flag if you are developping a command-line tool and don't want to execute `pip install .` every time you want to test your modifications.
 
+### Note for Windows users
+You can use the Powershell to use these tools!!! Simply add the `C:\Path\To\Anaconda3\Scripts` path to your environment variable `Path`.
+
+Reminder (Windows 7): you can modify the `Path` environment variable by clicking right on `Computer>Properties` in the start menu or the explorer, then `Advanced system settings` on the left menu, `Advanced` tab, `Environment variables...` and finally editing the `Path` variable in your System variables list.
+
 ## Add a new command-line tool
 
 So you have this new tool that you would like to develop and share. These command-line tools are based on the [Click package](http://click.pocoo.org) which provides an easy way of implementing command-line tools and documenting them automatically. The basic usage is described below.
