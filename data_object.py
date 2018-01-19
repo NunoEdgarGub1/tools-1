@@ -45,7 +45,7 @@ class DataObjectHDF5 ():
 			try:
 				self.data_dict['code'][i] = inspect.getsource(getattr(self, i))
 			except:
-				print "Non-existing function: ", i
+				print ("Non-existing function: ", i)
 		return self.data_dict['code']
 
 	def save_object_to_file (self, obj, f):
