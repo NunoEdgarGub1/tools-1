@@ -108,6 +108,21 @@ def range_to_edge(middles):
     
     return pl.array(edges)
 
+def crop_array(array, top, right, bottom, left):
+    """Crops a 2D numpy array
+    
+    Args:
+        array (numpy array): array to crop
+        top (int): number of pixels to crop at the top of the array
+        right (int): number of pixels to crop at the right of the array
+        bottom (int): number of pixels to crop at the bottom of the array
+        left (int): number of pixels to crop at the left of the array
+    
+    Returns:
+        numpy array: cropped array
+    """
+    return array[top:-bottom, left:-right]
+
 
 if __name__ == '__main__':
     x = pl.linspace(0, 10, 100)

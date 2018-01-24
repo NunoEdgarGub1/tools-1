@@ -11,12 +11,13 @@ from setuptools import setup
 setup(
     name="qplCommandLineTools",
     version='0.1',
-    py_modules=['speRead'],
+    py_modules=['qplCommandLineTools'],
     install_requires=[
         'Click',
     ],
     entry_points='''
         [console_scripts]
         speread=speRead:spe_read
+        plottxt=univPlot:plot_file
     ''',
 )

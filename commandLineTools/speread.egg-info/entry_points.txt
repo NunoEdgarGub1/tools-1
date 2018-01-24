@@ -1,4 +1,0 @@
-
-        [console_scripts]
-        speread=speRead:spe_read
-    

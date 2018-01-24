@@ -16,6 +16,14 @@ from scipy.ndimage import imread
 import os
 
 def readFits(filename):
+    """Reads FITS files with one frame, or any other image opened by scipy.ndimage.imread.
+    
+    Args:
+        filename (str): path to the FITS (or tif, jpg, png, etc.) image file
+    
+    Returns:
+        numpy array: array describing the file
+    """
     dataToRet = None
     try:
         fitsFile = fits.open(filename)
@@ -28,6 +36,14 @@ def readFits(filename):
     return dataToRet
     
 def saveFits(filepath, data, overwrite=False):
+    """Saves a numpy array to a FITS image file.
+    
+    Args:
+        filepath (str): path to the file to save
+        data (numpy array): numpy array containing the image to save
+        overwrite (bool, optional): if overwrite is True, will erase previously existing file, 
+                                    otherwise (Default), will create a new file adding an index number in the filename.
+    """
     # strip extension from filepath
     filepath, extension = os.path.splitext(filepath)
     if extension == '':
