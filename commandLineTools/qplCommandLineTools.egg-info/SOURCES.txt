@@ -1,0 +1,7 @@
+README.md
+qplCommandLineTools.egg-info/PKG-INFO
+qplCommandLineTools.egg-info/SOURCES.txt
+qplCommandLineTools.egg-info/dependency_links.txt
+qplCommandLineTools.egg-info/entry_points.txt
+qplCommandLineTools.egg-info/requires.txt
+qplCommandLineTools.egg-info/top_level.txt

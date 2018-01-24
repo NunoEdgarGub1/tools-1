@@ -1,0 +1,5 @@
+
+        [console_scripts]
+        speread=speRead:spe_read
+        plottxt=univPlot:plot_file
+    
