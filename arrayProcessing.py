@@ -108,6 +108,7 @@ def range_to_edge(middles):
     
     return pl.array(edges)
 
+
 def crop_array(array, top, right, bottom, left):
     """Crops a 2D numpy array
     
@@ -122,6 +123,25 @@ def crop_array(array, top, right, bottom, left):
         numpy array: cropped array
     """
     return array[top:-bottom, left:-right]
+
+
+def histeq(im, nb_bins=256):
+    """
+    This function equalises the histogram of im (numpy array), distributing
+    the pixels accross nbr_bins bins.
+    Returns the equalised image as a numpy array (same shape as input).
+    Largely copied from https://stackoverflow.com/a/28520445  
+        (author: Trilarion, 17/07/2017)
+    """
+    # get image histogram
+    imhist, bins = pl.histogram(im.flatten(), nb_bins, normed=True)
+    cdf = imhist.cumsum() #cumulative distribution function
+    cdf = 65535 * cdf / cdf[-1] #normalize
+    
+    # use linear interpolation of cdf to find new pixel values
+    im2 = pl.interp(im.flatten(), bins[:-1], cdf)
+    
+    return im2.reshape(im.shape)
 
 
 if __name__ == '__main__':
