@@ -21,7 +21,12 @@ import os
 def plot_file(filenames, force_shape='auto', yonly=False):
     """
     Reads and plots text files containing data in columns or lines.
-    
+    Will try different types of delimiters and skip automatically rows it cannot interpret at the beginning of the file.
+    """
+    plotfile(filenames, force_shape=force_shape, yonly=yonly)
+
+def plotfile(filenames, force_shape='auto', yonly=False):
+    """
     Args:
         filenames (tuple or list): list of filenames containing the data to plot (can be parsed with *)
         force_shape (str, optional): change the way the data is read from the file.
