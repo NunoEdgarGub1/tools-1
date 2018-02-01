@@ -10,3 +10,21 @@ Here is the procedure to follow to get the lab packages available on a new Windo
 6. Now input the path to the folder where the GIT repositories were cloned (typically "C:\Users\QPL\Desktop\LabSharedPrograms\"). If you are editing a preexisting path, add it at the end separated by a semi-colon (or check other variables to see which separation character you should use).
 
 You can then check if you can import packages from the GIT repositories in Python, but remember to restart the terminal in which you are doing the test — just restarting the kernel might not be enough. 
+
+# Configuration of the Paths for Console usage on Windows
+
+To use Python from the terminal on Windows ([Cmder](http://cmder.net/) is recommended, or at least the Powershell which should be there by default on Windows 7), you need to add some paths to your system, which are associated to your Anaconda distribution:
+```
+C:\ProgramData\Anaconda3\Scripts;C:\ProgramData\Anaconda3;C:\ProgramData\Anaconda3\Library\bin
+```
+
+Add these paths to the Path variable in the System variables window (Right-click Computer > Properties > Advanced system settings > Advanced > Environment variables, bottom list: search for `Path` or `PATH`, etc.). 
+
+If your Anaconda distribution is not installed at this path or if you are not using Anaconda, you should have similar paths leading to utilities like the python executable, iPython or other utilities like the batch file executing `pyuic` (to convert Qt .ui files into python code).
+
+
+# Python packages to install
+
+To make things easier, here is a list of Python packages that are needed by the different programs we have on Github:
+
+- 
