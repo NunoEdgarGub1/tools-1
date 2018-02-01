@@ -27,4 +27,23 @@ If your Anaconda distribution is not installed at this path or if you are not us
 
 To make things easier, here is a list of Python packages that are needed by the different programs we have on Github:
 
-- 
+- PyQt, version 4 on Python 2.7 and version 5 on Python >3.6 (classic, usually already there),
+- Matplotlib to plot graphs (classic, usually already there),
+- Numpy for any scientific calculations (classic, usually already there),
+- Scipy is numpy with more (classic, usually already there),
+- PyQtGraph to plot nice graphs in QT, very light and fast,
+- PyVISA to communicate with instruments using the [VISA](https://en.wikipedia.org/wiki/Virtual_instrument_software_architecture) interface,
+- PyDAQmx to specifically handle the National Instruments boxes like the NI-6341,
+- PyUSB to handle directly the USB interface (might be able to replace it using PyVISA, to check for the future),
+- XMLtoDict allows to import/export XML files from Python easily,
+- for the Swabian Instruments correlation card, you need to download the library directly from their website.
+
+A small copy-paste from below should make things easier for you:
+```
+conda install pyqt=5 maplotlib numpy scipy 
+pip install pyqtgraph pyvisa pydaqmx pyusb xmltodict
+```
+
+__NOTE:__ for Python 2.7 environments, please replace `pyqt=5` by `pyqt=4` to install PyQt4 instead of PyQt5.
+
+__NOTE 2:__ the default environment from Anaconda should already have PyQt, Numpy, Scipy and Matplotlib. Therefore, you only need to install the package on the _second_ line.
