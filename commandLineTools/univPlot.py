@@ -43,11 +43,11 @@ def plotfile(filenames, force_shape='auto', yonly=False):
         list_of_filenames = glob.glob(filename_pattern)
         for filename in list_of_filenames:
             file_array = loadtxt_gen_skiprows(filename)
-            print(file_array.shape)
+            # print(file_array.shape)
             if len(file_array.shape) > 1 and ((file_array.shape[0] > file_array.shape[1] and force_shape == 'auto') or force_shape == 'columns'):
                 file_array = file_array.transpose()
             if len(file_array.shape) == 1 or yonly:
-                print(len(file_array), 'YOLOOOOOO', file_array)
+                # print(len(file_array), 'YOLOOOOOO', file_array)
                 file_array = pl.vstack([range(file_array.transpose().shape[0]), file_array])
             for y_vector in file_array[1:]:
                 pl.plot(file_array[0], y_vector, label=os.path.basename(filename))
