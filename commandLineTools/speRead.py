@@ -16,7 +16,7 @@ import tools.instruments.princeton3.SPE3read as spe3
 
 
 @click.command()
-@click.argument('filename', type=click.Path(exists=True))
+@click.argument('filename', nargs=1, required=True, type=click.Path(exists=True))
 @click.option('--export', '-o', type=click.Path(exists=False, writable=True), nargs=1, help="export as text file to this path.")
 @click.option('--autoexport', '-a', is_flag=True, help="export as text file with automatic name (name of original file + frame number).")
 @click.option('--index', '-i', type=click.INT, nargs=1, default=0, help="index of spectrum to export or to display first.")
