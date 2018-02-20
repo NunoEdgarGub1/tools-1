@@ -10,7 +10,7 @@ cd /blablabla/git-repos/tools/commandLineTools
 
 You can then install the command-line tools by simply executing
 ```
-pip install .
+pip install --editable .
 ```
 Note that you can add an `--editable` flag if you are developping a command-line tool and don't want to execute `pip install .` every time you want to test your modifications.
 
