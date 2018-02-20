@@ -1,4 +1,4 @@
-#Access to packages on a new computer (Windows)
+# Access to packages on a new computer (Windows)
 
 Here is the procedure to follow to get the lab packages available on a new Windows 7 computer:
 
@@ -40,7 +40,7 @@ To make things easier, here is a list of Python packages that are needed by the 
 
 A small copy-paste from below should make things easier for you:
 ```
-conda install pyqt=5 maplotlib numpy scipy 
+conda install pyqt=5 matplotlib numpy scipy 
 pip install pyqtgraph pyvisa pydaqmx pyusb xmltodict
 ```
 
