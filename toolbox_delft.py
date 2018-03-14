@@ -146,7 +146,7 @@ def latest_data(contains='', older_than=None, newer_than=None,return_timestamp =
     while i >= 0 and not end_search:  #Go through all days, starting from the latest one
         daydir = daydirs[i]
         if VERBOSE:
-            print 'search dir: ', search_dir, ' day dir: ', daydir, ' break? ', end_search
+            print ('search dir: ', search_dir, ' day dir: ', daydir, ' break? ', end_search)
         all_measdirs = [d for d in os.listdir(os.path.join(search_dir, daydir))]
         all_measdirs.sort() # get a sorted list of all measurements on that day
 
@@ -158,21 +158,21 @@ def latest_data(contains='', older_than=None, newer_than=None,return_timestamp =
                 dstamp,tstamp = verify_timestamp(_timestamp)
             except:
                 if VERBOSE:
-                    print 'Timestamp not valid: ', dstamp,tstamp
+                    print ('Timestamp not valid: ', dstamp,tstamp)
                 continue
             timestamp = dstamp+tstamp
 
             if contains in d:    # file matching the name search found. Does it match the date constraints?
                 if VERBOSE:
-                    print 'contains ', contains, ' d ', d 
-                    print ' break? ', end_search, ' return all? ', return_all           
+                    print ('contains ', contains, ' d ', d)
+                    print (' break? ', end_search, ' return all? ', return_all)           
                 if older_than != None:
                     if not is_older(timestamp, older_than):
                         continue    # go to next measurement directory
                 if newer_than != None:
                     if is_older(timestamp, newer_than):
                         if VERBOSE:
-                            print 'Now I get to files which are too old'
+                            print ('Now I get to files which are too old')
                         end_search = True
                         continue
                 measdirs.append(d) # if no continue command has been set, the file is valid.
@@ -180,13 +180,13 @@ def latest_data(contains='', older_than=None, newer_than=None,return_timestamp =
                 if not return_all:
                     end_search = True
                 if VERBOSE:
-                    print 'Found a file. older than: ', older_than, ', timestamp: ', timestamp, ' Stop? ', end_search
+                    print ('Found a file. older than: ', older_than, ', timestamp: ', timestamp, ' Stop? ', end_search)
             if end_search:
                 break  # stop for loop
         i -= 1   #go to next day
 
     if VERBOSE:
-        print 'measdirs length: ', len(measdirs)
+        print ('measdirs length: ', len(measdirs))
     if len(measdirs) == 0:
         if raise_exc == True:
             raise Exception('No fitting data found containing {}.'.format(contains))
@@ -310,7 +310,7 @@ def file_in_folder(folder, timestamp):
     all_files.sort()
 
     if (len(all_files)>1):
-        print 'More than one file satisfies the requirements! Import: '+all_files[0]
+        print ('More than one file satisfies the requirements! Import: '+all_files[0])
 
     return all_files[0]
 
@@ -358,7 +358,7 @@ def get_msmt_name(pqf):
         raise Exception('Cannot find the name of the measurement.')
 
     else:
-        print "Neither filepath nor file enetered in function please check:", pqf
+        print ("Neither filepath nor file enetered in function please check:", pqf)
         raise
 
 
@@ -392,7 +392,7 @@ def has_analysis_data(pqf, name, analysisgrp = 'analysis', subgroup=None):
         try:
             f = h5py.File(pqf, 'r')
         except:
-            print "Cannot open file", pqf
+            print ("Cannot open file", pqf)
             raise
         
         if analysisgrp in f.keys():
@@ -407,7 +407,7 @@ def has_analysis_data(pqf, name, analysisgrp = 'analysis', subgroup=None):
             f.close()
             return False
     else:
-        print "Neither filepath nor file enetered in function please check:", pqf
+        print ("Neither filepath nor file enetered in function please check:", pqf)
         raise 
 
 def get_analysis_data(pqf, name, analysisgrp = 'analysis', subgroup=None):
@@ -426,15 +426,15 @@ def get_analysis_data(pqf, name, analysisgrp = 'analysis', subgroup=None):
         attrs = {}
         for (an, av) in agrp[name].attrs.items():
             attrs[an] = av
-            print attrs
-            print type(attrs)
+            print (attrs)
+            print (type(attrs))
 
         return dat, attrs
     elif type(pqf) == str:
         try:
             f = h5py.File(pqf, 'r')
         except:
-            print "Cannot open file", pqf
+            print ("Cannot open file", pqf)
             raise
         
         agrp = f.require_group(analysisgrp + ('/' + subgroup if subgroup!=None else ''))
@@ -451,7 +451,7 @@ def get_analysis_data(pqf, name, analysisgrp = 'analysis', subgroup=None):
         
         return dat, attrs
     else:
-        print "Neither filepath nor file enetered in function please check:", pqf
+        print ("Neither filepath nor file enetered in function please check:", pqf)
         raise
 
 
@@ -463,7 +463,7 @@ def clear_analysis_data(fp, ANALYSISGRP = 'analysis'):
     try:
         f = h5py.File(fp, 'r+')
     except:
-        print "Cannot open file", fp
+        print ("Cannot open file", fp)
         raise
 
     if ANALYSISGRP in f.keys():
@@ -485,7 +485,7 @@ def clear_raw_data(fp, name):
     try:
         f = h5py.File(fp, 'r+')
     except:
-        print "Cannot open file", fp
+        print ("Cannot open file", fp)
         raise
 
     if name in f.keys():
@@ -506,7 +506,7 @@ def set_raw_data(fp, name, data):
     try:
         f = h5py.File(fp, 'r+')
     except:
-        print "Cannot open file", fp
+        print ("Cannot open file", fp)
         raise
 
     f[name] = data
@@ -521,7 +521,7 @@ def set_analysis_data(fp, name, data, attributes, subgroup=None, ANALYSISGRP = '
     try:
         f = h5py.File(fp, permissions)
     except:
-        print "Cannot open file", fp
+        print ("Cannot open file", fp)
         raise
 
     try:
