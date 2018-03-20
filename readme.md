@@ -37,10 +37,13 @@ To make things easier, here is a list of Python packages that are needed by the 
 - PyUSB to handle directly the USB interface (might be able to replace it using PyVISA, to check for the future),
 - XMLtoDict allows to import/export XML files from Python easily,
 - for the Swabian Instruments correlation card, you need to download the library directly from their website.
+- tinyRPC and gevent-websocket handles FPGA boxes like the Swabian Instruments Pulse generator
+- tabulate to print nice tables in the console
+
 
 A small copy-paste from below should make things easier for you:
 ```
-conda install pyqt=5 matplotlib numpy scipy 
+conda install pyqt=5 matplotlib numpy scipy tinyrpc gevent-websocket tabulate
 pip install pyqtgraph pyvisa pydaqmx pyusb xmltodict
 ```
 
