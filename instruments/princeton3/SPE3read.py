@@ -37,12 +37,18 @@ class SPE3map:
         SPEVERSIONOFFSET (int): offset in bytes where to read the SPE version in the file
         wavelength (numpy array): array of floats containing the wavelengths vector read from the file.
         XMLFOOTEROFFSETPOS (int): position in bytes giving the offset to the XML footer (UnsignedInteger64)
+        grating (string): selected grating information
+        central_wavelength: central wavelength for measurement
+
+    Note:
+        If the file contains multiple regions of interest then data will contain a dictionary
+        where each key corresponds to the data described above for one region.
     """
-    
+
     SPEVERSIONOFFSET = 1992  # offset for obtaining SPE version (float32)    
     XMLFOOTEROFFSETPOS = 678  # position in bytes giving the offset to the XML footer (UnsignedInteger64)
     DATAOFFSET = 4100  # offset to the binary data is fixed (4100 bytes) in SPE 2.X/3 file format
-    
+
     def __init__(self, fname = None, fid = None):
         """
         This function initializes the class and, if either a filename or fid is
@@ -52,7 +58,7 @@ class SPE3map:
             fname (str, optional): Filename of SPE file
             fid (file, optional): File ID object of open stream (NOTE: never tested)
         """
-        
+
         self._fid = None
         self.fname = fname
         if fname is not None:
@@ -63,7 +69,7 @@ class SPE3map:
         if self._fid:
             self.readData()
             self._fid.close()
-            
+
     def readData(self):
         """Read all the data into the class"""
         self._readSPEversion()
@@ -78,10 +84,15 @@ class SPE3map:
         self._readRegionSize()
         self._readExposureTime()
         self._readArray()
-        
+
+        # Store other useful info
+        self.center_wavelength = int(self._footerInfo['SpeFormat']['DataHistories']['DataHistory']['Origin']['Experiment']['Devices']['Spectrometers']['Spectrometer']['Grating']['CenterWavelength']['#text'])
+        self.grating = self._footerInfo['SpeFormat']['DataHistories']['DataHistory']['Origin']['Experiment']['Devices']['Spectrometers']['Spectrometer']['Grating']['Selected']['#text']
+
+
     def openFile(self, fname):
         """Open a SPE file
-        
+
         Args:
             fname (str): filename
         """
@@ -90,23 +101,23 @@ class SPE3map:
 
     def _readAtNumpy(self, pos, size, ntype):
         """Reads a number from the file.
-        
+
         Args:
             pos (int): Position in the file in bytes
             size (int): Number of elements to read (-1 for all items)
             ntype (data-type): Type of number (number of bytes to read = sizeof(ntype) * size)
-        
+
         Returns:
             number or numpy array: numpy array of read numbers if several numbers (size > 1). Simple number otherwise.
         """
         self._fid.seek(pos)
 #        print(ntype, type(ntype), size, type(size))
         return pl.fromfile(self._fid, ntype, int(size))
-        
+
     def _readSPEversion(self):
         """Determines SPE file version (always there in SPE 2.x or 3.0 files)"""
         self.SPEversion = self._readAtNumpy(self.SPEVERSIONOFFSET, 1, pl.float32)[0]
-        
+
     def _readXMLfooter(self):
         """Extracts the XML footer and puts it in _footerInfo as an ordered dictionnary (cf. xmltodict package)"""
         XMLfooterPos = self._readAtNumpy(self.XMLFOOTEROFFSETPOS, 1, pl.uint64)[0]
@@ -120,7 +131,7 @@ class SPE3map:
         except TypeError:  # will happen if <Wavelength> has no attributes (it happened). The ['#text'] won't exist then.
             wavelengthStr = self._footerInfo['SpeFormat']['Calibrations']['WavelengthMapping']['Wavelength']
         self.wavelength = pl.array([float(w) for w in wavelengthStr.split(',')])
-        
+
     def _readFramesInfo(self):
         """Extracts frames info from XML footer (number of frames, data type, frame size, frame stride)
         MUST BE CALLED AFTER _readXMLfooter()"""
@@ -134,14 +145,22 @@ class SPE3map:
         self.dataType = possibleDataTypes[dataTypeName]
         self.frameSize = int(self._footerInfo['SpeFormat']['DataFormat']['DataBlock']['@size'])
         self.frameStride = int(self._footerInfo['SpeFormat']['DataFormat']['DataBlock']['@stride'])
-        
+
     def _readRegionSize(self):
         """Extracts width and height of the region of interest
         MUST BE CALLED AFTER _readXMLfooter()"""
-        assert(self._footerInfo['SpeFormat']['DataFormat']['DataBlock']['DataBlock']['@type'] == 'Region')
-        height = int(self._footerInfo['SpeFormat']['DataFormat']['DataBlock']['DataBlock']['@height'])
-        width = int(self._footerInfo['SpeFormat']['DataFormat']['DataBlock']['DataBlock']['@width'])
-        self.regionSize = (height,width)
+        self.roi_data = self._footerInfo['SpeFormat']['DataFormat']['DataBlock']['DataBlock']
+        if type(self.roi_data) == list:
+            self.regionSize = list()
+            self.n_roi = len(self.roi_data)
+            for ROI in self.roi_data:
+                self.regionSize.append((int(ROI['@height']), int(ROI['@width'])))
+            print(self.regionSize)
+        else:
+            assert(self.roi_data['@type'] == 'Region')
+            height = int(self.roi_data['@height'])
+            width = int(self.roi_data['@width'])
+            self.regionSize = (height,width)
         
     def _readExposureTime(self):
         """Extracts the camera exposure time
@@ -150,11 +169,31 @@ class SPE3map:
         
     def _readArray(self):
         """Reads the binary data contained in the file"""
-        self.data = []
+        if type(self.regionSize) == list:
+            multi_roi = True
+            self.data = {('r'+str(i)):[] for i in range(len(self.regionSize)) }
+        else:
+            multi_roi = False
+            self.data = []
+
         for frameNb in range(self.nbOfFrames):
             frameData = self._readAtNumpy(self.DATAOFFSET + frameNb * self.frameStride, self.frameSize / self.dataType().nbytes, self.dataType)
-            self.data.append(frameData.reshape(self.regionSize))
-        self.data = pl.array(self.data)
+            if multi_roi:
+                val_count = 0
+                for idx_ROI, ROI in enumerate(self.regionSize):
+                    roi_size = pl.array(self.regionSize[idx_ROI])
+                    roi_n_vals = pl.prod(roi_size)
+                    roi_name = 'r' + str(idx_ROI)
+ 
+                    self.data[roi_name].append(frameData[val_count:(val_count+roi_n_vals)]\
+                            .reshape(roi_size))
+                    val_count += roi_n_vals
+            else:
+                self.data.append(frameData.reshape(self.regionSize))
+        if multi_roi:
+            self.data = {k: pl.array(v) for k, v in self.data.items()}
+        else:
+            self.data = pl.array(self.data)
         
     def saveXMLinfo(self, filePath):
         """allows the user to save the XML footer to a file of his choice
