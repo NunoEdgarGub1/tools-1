@@ -88,7 +88,7 @@ class SpeRead():
         self.ax.cla()
         pl.plot(self.data.wavelength, self.data.data[index][0])
         pl.xlabel('Wavelength (nm)')
-        pl.ylabel('Intensity (counts/{:.3f} s)'.format(self.data.exposureTime))
+        pl.ylabel('Intensity (counts/{:.3f} ms)'.format(self.data.exposureTime))
         pl.title('Spectrum {}/{}'.format(self.curr_pos + 1, self.data.nbOfFrames))
         self.fig.canvas.draw()
 
