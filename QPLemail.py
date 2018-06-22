@@ -29,7 +29,7 @@ class QPLmail ():
         server.login(self._usrname, self._pwd)
         server.send_message(msg)
         server.quit()
-        print('Successfully sent the mail.')
+        #print('Successfully sent the mail.')
 
     def fetch_unread (self, sender_of_interest=None):
         # Login to INBOX
@@ -41,7 +41,7 @@ class QPLmail ():
             status, response = imap.uid('search', None, 'UNSEEN', 'FROM {0}'.format(sender_of_interest))
         else:
             status, response = imap.uid('search', None, 'UNSEEN')
-        print (status, response)
+        #print (status, response)
 
         if status == 'OK':
             unread_msg_nums = response[0].split()

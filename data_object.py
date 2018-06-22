@@ -75,10 +75,60 @@ class DataObjectHDF5 ():
 					file_handle[k] = getattr (obj, k)
 			elif isinstance(obj.__dict__[k], np.ndarray):
 				file_handle.create_dataset (k, data = getattr (obj, k))
+			elif (type (obj.__dict__[k]) is list):
+				# there's some problems when saving lists of strings
+				b = [type (s) for s in obj.__dict__[k]]
+				c = [s is str for s in b]
+				if (any(c)):
+					pass
+				else:
+					file_handle.create_dataset (k, data = getattr (obj, k))
 
 		if type(f) is str:
 			file_handle.close()
 
+
+	def save_object_params_to_file (self, obj, f, params_list):
+
+		if type(f) is str:
+			if (f[-5:] != '.hdf5'):
+				f = f+'.hdf5'
+			file_handle = h5py.File(f, 'w')
+		else:
+			file_handle = f
+
+		for k in params_list:
+			try:
+				p = getattr (obj, k)
+				if (type(p) in [int, float, str]):
+					try:
+						file_handle.attrs[k] = p
+					except:
+						file_handle[k] = p
+				elif isinstance(p, np.float64):
+					try:
+						file_handle.attrs[k] = p
+					except:
+						file_handle[k] = p
+				elif isinstance(p, np.int32):
+					try:
+						file_handle.attrs[k] = p
+					except:
+						file_handle[k] = p
+				elif isinstance(p, np.ndarray):
+					file_handle.create_dataset (k, data = p)
+				elif (type (p) is list):
+					# there's some problems when saving lists of strings
+					b = [type (s) for s in p]
+					c = [s is str for s in b]
+					if (any(c)):
+						pass
+					else:
+						file_handle.create_dataset (k, data = p)
+			except:
+				print ("Variable ", k, " cannot be saved.")
+		if type(f) is str:
+			file_handle.close()
 
 
 
