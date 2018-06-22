@@ -87,8 +87,36 @@ class DataObjectHDF5 ():
 		if type(f) is str:
 			file_handle.close()
 
+	def save_object_all_vars_to_file (self, obj, f):
 
-	def save_object_params_to_file (self, obj, f, params_list):
+		if type(f) is str:
+			if (f[-5:] != '.hdf5'):
+				f = f+'.hdf5'
+			file_handle = h5py.File(f, 'w')
+		else:
+			file_handle = f
+
+		for k in obj.__dict__.keys():
+			if (type(obj.__dict__[k]) in [int, float, str]):
+				try:
+					file_handle.attrs[k] = getattr (obj, k)
+				except:
+					file_handle[k] = getattr (obj, k)
+			elif isinstance(obj.__dict__[k], np.float64):
+				try:
+					file_handle.attrs[k] = getattr (obj, k)
+				except:
+					file_handle[k] = getattr (obj, k)
+			elif isinstance(obj.__dict__[k], np.int32):
+				try:
+					file_handle.attrs[k] = getattr (obj, k)
+				except:
+					file_handle[k] = getattr (obj, k)
+		if type(f) is str:
+			file_handle.close()
+
+
+	def save_object_params_list_to_file (self, obj, f, params_list):
 
 		if type(f) is str:
 			if (f[-5:] != '.hdf5'):
@@ -125,8 +153,8 @@ class DataObjectHDF5 ():
 						pass
 					else:
 						file_handle.create_dataset (k, data = p)
-			except:
-				print ("Variable ", k, " cannot be saved.")
+			except Exception as e:
+				print ("Variable ", k, " cannot be saved. Exception: ", e)
 		if type(f) is str:
 			file_handle.close()
 
