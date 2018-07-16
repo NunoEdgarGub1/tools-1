@@ -34,11 +34,28 @@ class DataObjectHDF5 ():
 			elif isinstance(d[k], np.ndarray):
 				file_handle.create_dataset (k, data = d[k])
 
-	def load_file (self, file_name):
-		f = h5py.File(file_name,'r')
-		for k in f.attrs.keys():
-			setattr (self, k, f.attrs [k])
-		
+	def load_all_attributes (self, obj, file_handle):
+		for k in file_handle.attrs.keys():
+			setattr (obj, k, file_handle.attrs [k])
+
+	def load_all_datasets (self, obj, file_handle):
+		x, nsb_datasets = self.find_groups_and_datasets (file_handle)
+
+		for k in nsb_datasets:
+			setattr (obj, k, file_handle[k].value)
+
+	def load_all_into_object (self, obj, file_handle):
+		self.load_all_attributes (obj=obj, file_handle = file_handle)
+		self.load_all_datasets (obj=obj, file_handle = file_handle)
+
+	def find_groups_and_datasets (self, file_handle):
+
+		all_h5_objs = []
+		file_handle.visit(all_h5_objs.append)
+		all_groups   = [ obj for obj in all_h5_objs if isinstance(file_handle[obj],h5py.Group) ]
+		all_datasets = [ obj for obj in all_h5_objs if isinstance(file_handle[obj],h5py.Dataset)]
+		return all_groups, all_datasets
+
 	def store_function_code (self):
 		self.data_dict['code'] = {}
 		for i in self._called_modules:
