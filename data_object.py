@@ -12,9 +12,140 @@ Classes that need to load/save data from HDF5 files can inherit this class
 
 """
 import numpy as np
+import datetime
 import h5py
+import os, sys
 
-class DataObjectHDF5 ():
+class TimeStampObject ():
+
+	def __init__ (self, data_folder):
+		self._called_modules = []
+		self._data_folder = data_folder
+
+	def _fill_datetime_str (self, value):
+		if (len(value) == 4):
+			value += '01'
+		if (len(value) == 6):
+			value += '01'
+		if (len(value) == 8):
+			value += '_'
+		
+		return value.ljust (15, '0')
+
+	def parse_datetime_str (self, value, fill_void_in = True):
+
+		if fill_void_in:
+			value = self._fill_datetime_str (value)
+
+		try:
+			time_stamp = datetime.datetime.strptime (value, '%Y%m%d_%H%M%S')
+			return time_stamp
+		except:
+			print ("String not valid as time tag")
+			return None
+
+	def folder_is_valid (self, folder):
+		'''
+		This methods will be overloaded by the specific object
+		and will tell whether the folder content fulfills 
+		what is expected by the specific type of dataset
+
+		Returns:
+			bool -- [description]
+		'''
+		return True
+
+
+	def get_file_list (self, folder=None):
+
+		if (folder == None):
+			folder = self._data_folder
+
+		file_list = [f for f in os.listdir(folder) 
+				if (os.path.isfile(os.path.join(folder, f)))]
+		return file_list
+
+	def get_folder_list (self, folder=None):
+
+		if (folder == None):
+			folder = self._data_folder
+
+		folder_list = [f for f in os.listdir(folder) 
+				if (os.path.isdir(os.path.join(folder, f)))]
+		return folder_list
+
+	def get_data_folder_list (self, folder=None):
+		folder_list = self.get_folder_list (folder = folder)
+		data_folder_list = []
+		time_stamp_list = []
+
+		for f in folder_list:
+			try:
+				tag = f[:15]
+				time_tag = self.parse_datetime_str (value = tag, fill_void_in = False)
+				valid_tag = True
+			except:
+				valid_tag = False
+
+			if valid_tag:
+				if self.folder_is_valid (f):
+					data_folder_list.append(f)
+					time_stamp_list.append(time_tag)
+
+		return data_folder_list, time_stamp_list
+
+	def get_data_with_tag (self, tag_list = [], logic_operator = 'all'):
+
+		tag_data_list = []
+
+		if (logic_operator in ['all', 'any']):
+
+			data_folder_list, time_stamp_list = self.get_data_folder_list ()
+
+			for f in data_folder_list:
+
+				if self.folder_is_valid (f):
+
+					bool_list = [(t in f) for t in tag_list]
+
+					if (logic_operator == 'all'):
+						valid = all(bool_list)
+					elif (logic_operator == 'any'):
+						valid = any (bool_list)
+
+					if valid:
+						tag_data_list.append (f)
+		
+		else:
+			print ("Allowed logic operators: all, any")
+
+		return tag_data_list
+
+
+
+
+	def get_data_between_stamps (self, later_than, earlier_than):
+
+		t1 = self.parse_datetime_str (later_than, fill_void_in = True)
+		t2 = self.parse_datetime_str (earlier_than, fill_void_in = True)
+
+		f_list = []
+		t_list = []
+
+		if ((t1 != None) and (t2 != None)):
+
+			data_folder_list, time_stamp_list = self.get_data_folder_list ()
+
+			for idx, t in enumerate(time_stamp_list):
+
+				if ((t<=t2) and (t>=t1)):
+					f_list.append (data_folder_list[idx])
+
+		return f_list
+
+
+
+class DataObjectHDF5 (TimeStampObject):
 	
 	def __init__(self):
 		self.data_dict = {}
