@@ -75,6 +75,7 @@ class TimeStampObject ():
 		return folder_list
 
 	def get_data_folder_list (self, folder=None):
+
 		folder_list = self.get_folder_list (folder = folder)
 		data_folder_list = []
 		time_stamp_list = []
@@ -122,24 +123,25 @@ class TimeStampObject ():
 		return tag_data_list
 
 
-
-
 	def get_data_between_stamps (self, later_than, earlier_than):
 
-		t1 = self.parse_datetime_str (later_than, fill_void_in = True)
-		t2 = self.parse_datetime_str (earlier_than, fill_void_in = True)
-
 		f_list = []
-		t_list = []
 
-		if ((t1 != None) and (t2 != None)):
+		if ((later_than != None) and (earlier_than != None)):
+			t1 = self.parse_datetime_str (later_than, fill_void_in = True)
+			t2 = self.parse_datetime_str (earlier_than, fill_void_in = True)
 
-			data_folder_list, time_stamp_list = self.get_data_folder_list ()
+			f_list = []
+			t_list = []
 
-			for idx, t in enumerate(time_stamp_list):
+			if ((t1 != None) and (t2 != None)):
 
-				if ((t<=t2) and (t>=t1)):
-					f_list.append (data_folder_list[idx])
+				data_folder_list, time_stamp_list = self.get_data_folder_list ()
+
+				for idx, t in enumerate(time_stamp_list):
+
+					if ((t<=t2) and (t>=t1)):
+						f_list.append (data_folder_list[idx])
 
 		return f_list
 
