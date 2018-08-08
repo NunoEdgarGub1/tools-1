@@ -208,6 +208,7 @@ class DataObjectHDF5 (TimeStampObject):
 			file_handle = f
 
 		for k in obj.__dict__.keys():
+
 			if (type(obj.__dict__[k]) in [int, float, str]):
 				try:
 					file_handle.attrs[k] = getattr (obj, k)
@@ -226,14 +227,17 @@ class DataObjectHDF5 (TimeStampObject):
 			elif isinstance(obj.__dict__[k], np.ndarray):
 				file_handle.create_dataset (k, data = getattr (obj, k))
 			elif (type (obj.__dict__[k]) is list):
-				# there's some problems when saving lists of strings
-				b = [type (s) for s in obj.__dict__[k]]
-				c = [s is str for s in b]
-				if (any(c)):
+				try:
+					# there's some problems when saving lists of strings
+					b = [type (s) for s in obj.__dict__[k]]
+					c = [s is str for s in b]
+					if (any(c)):
+						pass
+					else:
+						file_handle.create_dataset (k, data = getattr (obj, k))
+				except:
 					pass
-				else:
-					file_handle.create_dataset (k, data = getattr (obj, k))
-
+					
 		if type(f) is str:
 			file_handle.close()
 
