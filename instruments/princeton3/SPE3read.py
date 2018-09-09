@@ -86,13 +86,12 @@ class SPE3map:
         self._readArray()
 
         # Store other useful info
-        self.center_wavelength = int(self._footerInfo['SpeFormat']['DataHistories']['DataHistory']['Origin']['Experiment']['Devices']['Spectrometers']['Spectrometer']['Grating']['CenterWavelength']['#text'])
+        self.center_wavelength = int(float(self._footerInfo['SpeFormat']['DataHistories']['DataHistory']['Origin']['Experiment']['Devices']['Spectrometers']['Spectrometer']['Grating']['CenterWavelength']['#text']))
         self.grating = self._footerInfo['SpeFormat']['DataHistories']['DataHistory']['Origin']['Experiment']['Devices']['Spectrometers']['Spectrometer']['Grating']['Selected']['#text']
 
 
     def openFile(self, fname):
         """Open a SPE file
-
         Args:
             fname (str): filename
         """
