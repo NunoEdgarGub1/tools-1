@@ -33,6 +33,14 @@ class TimeStampObject ():
 		return value.ljust (15, '0')
 
 	def parse_datetime_str (self, value, fill_void_in = True):
+		'''
+		Parses a string into a time_stamp (if valid, else returns None).
+		The string is supposed to be in '%Y%m%d_%H%M%S' format. 
+		If param fill_void_in is set to true, subsets of the format can be used and will be filled with zeros for the missing parts.
+
+		Returns:
+		time stamp
+		'''
 
 		if fill_void_in:
 			value = self._fill_datetime_str (value)
@@ -58,6 +66,13 @@ class TimeStampObject ():
 
 	def get_file_list (self, folder=None):
 
+		'''
+		Return list of files in folder
+
+		Inputs:
+		folder [str]: if None, it sets value in self._data_folder
+		'''
+
 		if (folder == None):
 			folder = self._data_folder
 
@@ -66,6 +81,12 @@ class TimeStampObject ():
 		return file_list
 
 	def get_folder_list (self, folder=None):
+		'''
+		Return list of sub-folders in folder
+
+		Inputs:
+		folder [str]: if None, it sets value in self._data_folder
+		'''
 
 		if (folder == None):
 			folder = self._data_folder
@@ -75,6 +96,19 @@ class TimeStampObject ():
 		return folder_list
 
 	def get_data_folder_list (self, folder=None):
+
+		'''
+		Returns list of "valid" data_sub-folders in folder.
+		Valid here means the folder has the correct time stamp.
+
+		Inputs:
+		folder [str]: if None, self._data_folder
+
+		Outputs:
+		list of data sub-folders, list of corresponding time stmaps
+		
+		[description]
+		'''
 
 		folder_list = self.get_folder_list (folder = folder)
 		data_folder_list = []
@@ -96,6 +130,17 @@ class TimeStampObject ():
 		return data_folder_list, time_stamp_list
 
 	def get_data_with_tag (self, tag_list = [], logic_operator = 'all'):
+
+		'''
+		Returns list of valid data_folders which incluse "any" or "all" the tag specified in tag_list
+
+		Inputs:
+		tag_list: list of tags (str)
+		logic_operator: 'all' or 'any'
+		
+		Outputs:
+		List of data_folders satisfying the conditions
+		'''
 
 		tag_data_list = []
 
@@ -124,6 +169,17 @@ class TimeStampObject ():
 
 
 	def get_data_between_stamps (self, later_than, earlier_than):
+
+		'''
+		Returns list of valid data_folders with time_stamps between the values specified by "lather_than" and "earlier_than"
+
+		Inputs:
+		later_than [str]: time stamp
+		earlier_than [str]: time stamp
+		
+		Outputs:
+		List of data_folders satisfying the conditions
+		'''
 
 		f_list = []
 
@@ -154,6 +210,15 @@ class DataObjectHDF5 (TimeStampObject):
 		self._called_modules=[]
 
 	def save_dict_to_file(self, d, file_handle):
+
+		'''
+		Saves a dictionary d to a file (file_handle)
+		
+		Inputs:
+		d [dictionary]
+		file_handle: handle for hdf5 file
+
+		'''
 		for k in d.keys():
 			if isinstance(d[k], dict):
 				grp = file_handle.create_group(k)
@@ -168,10 +233,25 @@ class DataObjectHDF5 (TimeStampObject):
 				file_handle.create_dataset (k, data = d[k])
 
 	def load_all_attributes (self, obj, file_handle):
+		'''
+		Loads all attributes (variables) in hdf5 file (file_handle) into an object (obj)
+
+		Inputs:
+		obj: object
+		file_handle
+		'''
+
 		for k in file_handle.attrs.keys():
 			setattr (obj, k, file_handle.attrs [k])
 
 	def load_all_datasets (self, obj, file_handle):
+		'''
+		Loads all datasets (arrays) in hdf5 file (file_handle) into an object (obj)
+
+		Inputs:
+		obj: object
+		file_handle
+		'''
 		x, nsb_datasets = self.find_groups_and_datasets (file_handle)
 
 		for k in nsb_datasets:
