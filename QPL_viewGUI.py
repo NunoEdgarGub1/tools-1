@@ -26,10 +26,14 @@ class QPLZoomableGUI(QtWidgets.QMainWindow):
         self.cursor_clicked = False
 
     def _update_figure (self):
-        pass
+        self.ui.canvas.update_figure()
 
     def _update_view(self):
-        pass
+        x0 = min (self.x0, self.x1)
+        x1 = max (self.x0, self.x1)
+        y0 = min (self.y0, self.y1)
+        y1 = max (self.y0, self.y1)
+        self.ui.canvas.set_range (axis1= [x0, x1], axis2 = [y0, y1])
 
     def fileQuit(self):
         self.close()
@@ -48,11 +52,7 @@ class QPLZoomableGUI(QtWidgets.QMainWindow):
                 self.mouse_clicked = True
 
     def mouseMove(self, event):
-        if self.mouse_clicked:
-            if (event.xdata != None):
-                self.x1 = event.xdata
-                # make sure you call the correct zoom rectangle, whether it's x-only or x/y
-                self.ui.canvas.draw_zoom_rect (self.x0, self.y0, self.x1, self.y1)
+        pass
 
     def mouseRelease(self, event):
         if (event.xdata != None):
@@ -64,7 +64,6 @@ class QPLZoomableGUI(QtWidgets.QMainWindow):
                 self.y1 = event.ydata
                 if self.mouse_clicked:
                     self.mouse_clicked = False
-                    self.ui.canvas.close_zoom_rect()
                     self.set_range(self.x0, self.y0, self.x1, self.y1)
             else:
                 self._set_cursor (cursor = c, position =x)

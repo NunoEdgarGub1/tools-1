@@ -234,10 +234,9 @@ class QPLCanvas_2D(ZoomableCanvas):
 
     def set_range (self, axis1, axis2):
         self.axes.set_xlim ([axis1[0], axis1[1]])
-        self.axes.set_xlim ([axis2[0], axis2[1]])
-        self.axes.figure.canvas.draw_idle()
-        self.repaint()
-
+        self.axes.set_ylim ([axis2[0], axis2[1]])
+        self.update_figure()
+        
     def set_data (self, i1, i2, value):
         self._2D_matrix [i1, i2] = value
         self._update_figure()
