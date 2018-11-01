@@ -18,8 +18,8 @@ class MplCanvas(Canvas):
         self._w_inches = width
         self._h_inches = height
         self._dpi = dpi
-        self.fig.subplots_adjust(left=0.05,right=0.95,
-                            bottom=0.2,top=0.98,
+        self.fig.subplots_adjust(left=0.15,right=0.95,
+                            bottom=0.15,top=0.95,
                             hspace=0,wspace=0)
 
         Canvas.__init__(self, self.fig)
@@ -225,6 +225,9 @@ class QPLCanvas_2D(ZoomableCanvas):
         ZoomableCanvas.__init__(self, *args, **kwargs)
         self._2D_matrix = []
 
+    def reinitialize(self):
+        self.axes.clear()
+
     def _recalculate (self, values):
         x0 =  values[0]
         x1 = values[-1]
@@ -241,12 +244,20 @@ class QPLCanvas_2D(ZoomableCanvas):
         self._2D_matrix [i1, i2] = value
         self._update_figure()
 
-    def set_2D_data (self, value, x=None, y=None):
+    def set_format_axes_ticks (self, digits=1):
+        self._digits = digits
+
+    def _format (self, x):
+        return [int(i*(10**self._digits))/(10**self._digits) for i in x]
+
+    def set_2D_data (self, value, x=None, y=None, scan_units = 'V'):
         if ((x is not None) and (y is not None)):
             [X, Y] = np.meshgrid (self._recalculate(x),self._recalculate(y))
             self.axes.pcolor (X, Y, value)
-            self.axes.xaxis.set_ticks (x)
-            self.axes.yaxis.set_ticks (y)
+            self.axes.xaxis.set_ticks (self._format(x))
+            self.axes.yaxis.set_ticks (self._format(y))
+            self.axes.set_xlabel ("X ("+str(scan_units)+')', fontsize = 15)
+            self.axes.set_ylabel ("Y ("+str(scan_units)+')', fontsize = 15)
         else:
             self.axes.pcolor (value)
         self.update_figure()
