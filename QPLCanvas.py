@@ -252,8 +252,8 @@ class QPLCanvas_2D(ZoomableCanvas):
 
     def set_2D_data (self, value, x=None, y=None, scan_units = 'V'):
         if ((x is not None) and (y is not None)):
-            [X, Y] = np.meshgrid (self._recalculate(x),self._recalculate(y))
-            self.axes.pcolor (X, Y, value)
+            [X, Y] = np.meshgrid (self._recalculate(x), self._recalculate(y))
+            self.axes.pcolor (X, Y, np.transpose(value))
             self.axes.xaxis.set_ticks (self._format(x))
             self.axes.yaxis.set_ticks (self._format(y))
             self.axes.set_xlabel ("X ("+str(scan_units)+')', fontsize = 15)

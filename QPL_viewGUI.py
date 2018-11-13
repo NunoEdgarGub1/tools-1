@@ -64,7 +64,8 @@ class QPLZoomableGUI(QtWidgets.QMainWindow):
                 self.y1 = event.ydata
                 if self.mouse_clicked:
                     self.mouse_clicked = False
-                    self.set_range(self.x0, self.y0, self.x1, self.y1)
+                    self.ui.canvas.set_range(axis1= [self.x0, self.x1], 
+                                                        axis2 = [self.y0, self.y1])
             else:
                 self._set_cursor (cursor = c, position =x)
 
