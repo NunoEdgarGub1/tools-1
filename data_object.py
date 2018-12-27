@@ -12,7 +12,7 @@ Classes that need to load/save data from HDF5 files can inherit this class
 
 """
 import numpy as np
-import datetime
+import datetime, time
 import h5py
 import os, sys
 
@@ -209,42 +209,62 @@ class DataObjectHDF5 (TimeStampObject):
 		self.data_dict = {}
 		self._called_modules=[]
 
-	def save_dict_to_file(self, d, file_handle):
+	def create_file (self, name, folder):
+		tstamp = time.strftime ('%Y%m%d_%H%M%S')
+		subf = os.path.join (folder, tstamp + '_'+ name + '/')
+		if not(os.path.exists(subf)):
+			os.mkdir(subf)
+		fname = os.path.join (subf, tstamp + '_' + name + '.hdf5')
+		f = h5py.File (fname, 'w')
+		f.close()
+		return fname
+
+	def save_dict_to_file(self, d, file_name, group_name = None):
 
 		'''
-		Saves a dictionary d to a file (file_handle)
+		Saves a dictionary d to a file )
 		
 		Inputs:
-		d [dictionary]
-		file_handle: handle for hdf5 file
+		d:			dictionary
+		file_name: 	name of existing hdf5 file
+		group_name: name of new group (if you wnat to save data to a new group in the file)
 
 		'''
-		for k in d.keys():
-			if isinstance(d[k], dict):
-				grp = file_handle.create_group(k)
-				self.save_dict_to_file (d = d[k], file_handle = grp)
-			elif (type (d[k]) in [int, float, str]):
-				file_handle.attrs[k] = d[k]
-			elif isinstance(d[k], np.int32):
-				file_handle.attrs[k] = d[k]
-			elif isinstance(d[k], np.float64):
-				file_handle.attrs[k] = d[k]
-			elif isinstance(d[k], np.ndarray):
-				file_handle.create_dataset (k, data = d[k])
 
-	def load_all_attributes (self, obj, file_handle):
+		with h5py.File (file_name, 'a') as file_handle:
+
+			if (group_name == None):
+				handle = file_handle
+			else:
+				grp = file_handle.create_group (group_name)
+				handle = grp
+
+			for k in d.keys():
+				if isinstance(d[k], dict):
+					grp = handle.create_group(k)
+					self.save_dict_to_file (d = d[k], file_handle = grp)
+				elif (type (d[k]) in [int, float, str]):
+					handle.attrs[k] = d[k]
+				elif isinstance(d[k], np.int32):
+					handle.attrs[k] = d[k]
+				elif isinstance(d[k], np.float64):
+					handle.attrs[k] = d[k]
+				elif isinstance(d[k], np.ndarray):
+					handle.create_dataset (k, data = d[k])
+
+	def load_all_attributes (self, obj, file_name):
 		'''
 		Loads all attributes (variables) in hdf5 file (file_handle) into an object (obj)
 
 		Inputs:
 		obj: object
-		file_handle
+		file_name
 		'''
+		with h5py.File (file_name, 'r') as file_handle:
+			for k in file_handle.attrs.keys():
+				setattr (obj, k, file_handle.attrs [k])
 
-		for k in file_handle.attrs.keys():
-			setattr (obj, k, file_handle.attrs [k])
-
-	def load_all_datasets (self, obj, file_handle):
+	def load_all_datasets (self, obj, file_name):
 		'''
 		Loads all datasets (arrays) in hdf5 file (file_handle) into an object (obj)
 
@@ -254,8 +274,9 @@ class DataObjectHDF5 (TimeStampObject):
 		'''
 		x, nsb_datasets = self.find_groups_and_datasets (file_handle)
 
-		for k in nsb_datasets:
-			setattr (obj, k, file_handle[k].value)
+		with h5py.File (file_name, 'r') as file_handle:
+			for k in nsb_datasets:
+				setattr (obj, k, file_handle[k].value)
 
 	def load_all_into_object (self, obj, file_handle):
 		self.load_all_attributes (obj=obj, file_handle = file_handle)
@@ -278,120 +299,111 @@ class DataObjectHDF5 (TimeStampObject):
 				print ("Non-existing function: ", i)
 		return self.data_dict['code']
 
-	def save_object_to_file (self, obj, f):
+	def save_object_to_file (self, obj, file_name, group_name = None):
 
-		if type(f) is str:
-			if (f[-5:] != '.hdf5'):
-				f = f+'.hdf5'
-			file_handle = h5py.File(f, 'w')
-		else:
-			file_handle = f
+		with h5py.File (file_name, 'a') as file_handle:
 
-		for k in obj.__dict__.keys():
+			if (group_name == None):
+				handle = file_handle
+			else:
+				grp = file_handle.create_group (group_name)
+				handle = grp
 
-			if (type(obj.__dict__[k]) in [int, float, str]):
-				try:
-					file_handle.attrs[k] = getattr (obj, k)
-				except:
-					file_handle[k] = getattr (obj, k)
-			elif isinstance(obj.__dict__[k], np.float64):
-				try:
-					file_handle.attrs[k] = getattr (obj, k)
-				except:
-					file_handle[k] = getattr (obj, k)
-			elif isinstance(obj.__dict__[k], np.int32):
-				try:
-					file_handle.attrs[k] = getattr (obj, k)
-				except:
-					file_handle[k] = getattr (obj, k)
-			elif isinstance(obj.__dict__[k], np.ndarray):
-				file_handle.create_dataset (k, data = getattr (obj, k))
-			elif (type (obj.__dict__[k]) is list):
-				try:
-					# there's some problems when saving lists of strings
-					b = [type (s) for s in obj.__dict__[k]]
-					c = [s is str for s in b]
-					if (any(c)):
+			for k in obj.__dict__.keys():
+
+				if (type(obj.__dict__[k]) in [int, float, str]):
+					try:
+						handle.attrs[k] = getattr (obj, k)
+					except:
+						handle[k] = getattr (obj, k)
+				elif isinstance(obj.__dict__[k], np.float64):
+					try:
+						handle.attrs[k] = getattr (obj, k)
+					except:
+						handle[k] = getattr (obj, k)
+				elif isinstance(obj.__dict__[k], np.int32):
+					try:
+						handle.attrs[k] = getattr (obj, k)
+					except:
+						handle[k] = getattr (obj, k)
+				elif isinstance(obj.__dict__[k], np.ndarray):
+					handle.create_dataset (k, data = getattr (obj, k))
+				elif (type (obj.__dict__[k]) is list):
+					try:
+						# there's some problems when saving lists of strings
+						b = [type (s) for s in obj.__dict__[k]]
+						c = [s is str for s in b]
+						if (any(c)):
+							pass
+						else:
+							handle.create_dataset (k, data = getattr (obj, k))
+					except:
 						pass
-					else:
-						file_handle.create_dataset (k, data = getattr (obj, k))
-				except:
-					pass
 					
-		if type(f) is str:
-			file_handle.close()
+	def save_object_all_vars_to_file (self, obj, file_name, group_name = None):
 
-	def save_object_all_vars_to_file (self, obj, f):
+		with h5py.File (file_name, 'a') as file_handle:
 
-		if type(f) is str:
-			if (f[-5:] != '.hdf5'):
-				f = f+'.hdf5'
-			file_handle = h5py.File(f, 'w')
-		else:
-			file_handle = f
+			if (group_name == None):
+				handle = file_handle
+			else:
+				grp = file_handle.create_group (group_name)
+				handle = grp
 
-		for k in obj.__dict__.keys():
-			if (type(obj.__dict__[k]) in [int, float, str]):
-				try:
-					file_handle.attrs[k] = getattr (obj, k)
-				except:
-					file_handle[k] = getattr (obj, k)
-			elif isinstance(obj.__dict__[k], np.float64):
-				try:
-					file_handle.attrs[k] = getattr (obj, k)
-				except:
-					file_handle[k] = getattr (obj, k)
-			elif isinstance(obj.__dict__[k], np.int32):
-				try:
-					file_handle.attrs[k] = getattr (obj, k)
-				except:
-					file_handle[k] = getattr (obj, k)
-		if type(f) is str:
-			file_handle.close()
-
-
-	def save_object_params_list_to_file (self, obj, f, params_list):
-
-		if type(f) is str:
-			if (f[-5:] != '.hdf5'):
-				f = f+'.hdf5'
-			file_handle = h5py.File(f, 'w')
-		else:
-			file_handle = f
-
-		for k in params_list:
-			try:
-				p = getattr (obj, k)
-				if (type(p) in [int, float, str]):
+			for k in obj.__dict__.keys():
+				if (type(obj.__dict__[k]) in [int, float, str]):
 					try:
-						file_handle.attrs[k] = p
+						handle.attrs[k] = getattr (obj, k)
 					except:
-						file_handle[k] = p
-				elif isinstance(p, np.float64):
+						handle[k] = getattr (obj, k)
+				elif isinstance(obj.__dict__[k], np.float64):
 					try:
-						file_handle.attrs[k] = p
+						handle.attrs[k] = getattr (obj, k)
 					except:
-						file_handle[k] = p
-				elif isinstance(p, np.int32):
+						handle[k] = getattr (obj, k)
+				elif isinstance(obj.__dict__[k], np.int32):
 					try:
-						file_handle.attrs[k] = p
+						handle.attrs[k] = getattr (obj, k)
 					except:
-						file_handle[k] = p
-				elif isinstance(p, np.ndarray):
-					file_handle.create_dataset (k, data = p)
-				elif (type (p) is list):
-					# there's some problems when saving lists of strings
-					b = [type (s) for s in p]
-					c = [s is str for s in b]
-					if (any(c)):
-						pass
-					else:
-						file_handle.create_dataset (k, data = p)
-			except Exception as e:
-				print ("Variable ", k, " cannot be saved. Exception: ", e)
-		if type(f) is str:
-			file_handle.close()
+						handle[k] = getattr (obj, k)
 
+	def save_object_params_list_to_file (self, obj, file_name, params_list, group_name = None):
 
+		with h5py.File (file_name, 'a') as file_handle:
 
+			if (group_name == None):
+				handle = file_handle
+			else:
+				grp = file_handle.create_group (group_name)
+				handle = grp
 
+			for k in params_list:
+				try:
+					p = getattr (obj, k)
+					if (type(p) in [int, float, str]):
+						try:
+							handle.attrs[k] = p
+						except:
+							handle[k] = p
+					elif isinstance(p, np.float64):
+						try:
+							handle.attrs[k] = p
+						except:
+							handle[k] = p
+					elif isinstance(p, np.int32):
+						try:
+							handle.attrs[k] = p
+						except:
+							handle[k] = p
+					elif isinstance(p, np.ndarray):
+						handle.create_dataset (k, data = p)
+					elif (type (p) is list):
+						# there's some problems when saving lists of strings
+						b = [type (s) for s in p]
+						c = [s is str for s in b]
+						if (any(c)):
+							pass
+						else:
+							handle.create_dataset (k, data = p)
+				except Exception as e:
+					print ("Variable ", k, " cannot be saved. Exception: ", e)
