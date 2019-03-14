@@ -347,7 +347,7 @@ class DataObjectHDF5 (TimeStampObject):
 			if (group_name == None):
 				handle = file_handle
 			else:
-				grp = file_handle.create_group (group_name)
+				grp = file_handle.require_group (group_name)
 				handle = grp
 
 			for k in obj.__dict__.keys():
@@ -374,7 +374,7 @@ class DataObjectHDF5 (TimeStampObject):
 			if (group_name == None):
 				handle = file_handle
 			else:
-				grp = file_handle.create_group (group_name)
+				grp = file_handle.require_group (group_name)
 				handle = grp
 
 			for k in params_list:
