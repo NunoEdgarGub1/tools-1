@@ -32,6 +32,9 @@ class MplCanvas(Canvas):
 
     def update_figure (self):
         pass
+
+    def set_tick_fontsize (self, fontsize):
+        self.axes.tick_params(labelsize=fontsize)
         
     def resize_canvas (self, w, h):
         self._w_inches = w/float(self._dpi)
