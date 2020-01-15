@@ -7,7 +7,7 @@ plt.clf()
 """
 Calculates the overlap of two gaussian
 
-Used for estimating vibration magnitudes
+Used for estimating vibration magnitudes 
 
 """
 
